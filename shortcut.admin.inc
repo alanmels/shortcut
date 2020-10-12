@@ -14,7 +14,7 @@
  *   The maximum number of shortcuts allowed to be added to a shortcut set.
  */
 function shortcut_max_slots() {
-  return variable_get('shortcut_max_slots', 7);
+  return config_get('shortcut.settings', 'shortcut_max_slots');
 }
 
 /**
@@ -83,8 +83,8 @@ function shortcut_set_switch($form, &$form_state, $account = NULL) {
     }
 
     $form['#attached'] = array(
-      'css' => array(drupal_get_path('module', 'shortcut') . '/shortcut.admin.css'),
-      'js' => array(drupal_get_path('module', 'shortcut') . '/shortcut.admin.js'),
+      'css' => array(backdrop_get_path('module', 'shortcut') . '/shortcut.admin.css'),
+      'js' => array(backdrop_get_path('module', 'shortcut') . '/shortcut.admin.js'),
     );
 
     $form['actions'] = array('#type' => 'actions');
@@ -142,10 +142,10 @@ function shortcut_set_switch_submit($form, &$form_state) {
     if ($account->uid == $user->uid) {
       // Only administrators can create new shortcut sets, so we know they have
       // access to switch back.
-      drupal_set_message(t('You are now using the new %set_name shortcut set. You can edit it from this page or <a href="@switch-url">switch back to a different one.</a>', $replacements));
+      backdrop_set_message(t('You are now using the new %set_name shortcut set. You can edit it from this page or <a href="@switch-url">switch back to a different one.</a>', $replacements));
     }
     else {
-      drupal_set_message(t('%user is now using a new shortcut set called %set_name. You can edit it from this page.', $replacements));
+      backdrop_set_message(t('%user is now using a new shortcut set called %set_name. You can edit it from this page.', $replacements));
     }
     $form_state['redirect'] = 'admin/config/user-interface/shortcut/' . $set->set_name;
   }
@@ -156,7 +156,7 @@ function shortcut_set_switch_submit($form, &$form_state) {
       '%user' => $account->name,
       '%set_name' => $set->title,
     );
-    drupal_set_message($account->uid == $user->uid ? t('You are now using the %set_name shortcut set.', $replacements) : t('%user is now using the %set_name shortcut set.', $replacements));
+    backdrop_set_message($account->uid == $user->uid ? t('You are now using the %set_name shortcut set.', $replacements) : t('%user is now using the %set_name shortcut set.', $replacements));
   }
 
   // Assign the shortcut set to the provided user account.
@@ -168,7 +168,10 @@ function shortcut_set_switch_submit($form, &$form_state) {
  */
 function shortcut_set_admin() {
   $shortcut_sets = shortcut_sets();
-  $header = array(t('Name'), array('data' => t('Operations'), 'colspan' => 4));
+  $header = array(t('Name'), array(
+      'data' => t('Operations'),
+      'colspan' => 4,
+    ));
 
   $rows = array();
   foreach ($shortcut_sets as $set) {
@@ -243,7 +246,7 @@ function shortcut_set_add_form_submit($form, &$form_state) {
     'links' => menu_links_clone($default_set->links),
   );
   shortcut_set_save($set);
-  drupal_set_message(t('The %set_name shortcut set has been created. You can edit it from this page.', array('%set_name' => $set->title)));
+  backdrop_set_message(t('The %set_name shortcut set has been created. You can edit it from this page.', array('%set_name' => $set->title)));
   $form_state['redirect'] = 'admin/config/user-interface/shortcut/' . $set->set_name;
 }
 
@@ -286,7 +289,10 @@ function shortcut_set_customize($form, &$form_state, $shortcut_set) {
     $form['shortcuts'][$status][$mlid]['status'] = array(
       '#type' => 'select',
       '#title' => t('Status'),
-      '#options' => array('disabled' => t('Disabled'), 'enabled' => t('Enabled')),
+      '#options' => array(
+        'disabled' => t('Disabled'),
+        'enabled' => t('Enabled'),
+      ),
       '#default_value' => $status,
       '#attributes' => array('class' => array('shortcut-status-select')),
     );
@@ -296,8 +302,8 @@ function shortcut_set_customize($form, &$form_state, $shortcut_set) {
   }
 
   $form['#attached'] = array(
-    'css' => array(drupal_get_path('module', 'shortcut') . '/shortcut.admin.css'),
-    'js' => array(drupal_get_path('module', 'shortcut') . '/shortcut.admin.js'),
+    'css' => array(backdrop_get_path('module', 'shortcut') . '/shortcut.admin.css'),
+    'js' => array(backdrop_get_path('module', 'shortcut') . '/shortcut.admin.js'),
   );
 
   $form['actions'] = array(
@@ -324,7 +330,7 @@ function shortcut_set_customize_submit($form, &$form_state) {
       menu_link_save($link);
     }
   }
-  drupal_set_message(t('The shortcut set has been updated.'));
+  backdrop_set_message(t('The shortcut set has been updated.'));
 }
 
 /**
@@ -339,7 +345,10 @@ function shortcut_set_customize_submit($form, &$form_state) {
  */
 function theme_shortcut_set_customize($variables) {
   $form = $variables['form'];
-  $map = array('disabled' => t('Disabled'), 'enabled' => t('Enabled'));
+  $map = array(
+    'disabled' => t('Disabled'),
+    'enabled' => t('Enabled'),
+  );
   $shortcuts_by_status = array(
     'enabled' => element_children($form['shortcuts']['enabled']),
     'disabled' => element_children($form['shortcuts']['disabled']),
@@ -349,24 +358,24 @@ function theme_shortcut_set_customize($variables) {
 
   $rows = array();
   foreach ($statuses as $status) {
-    drupal_add_tabledrag('shortcuts', 'match', 'sibling', 'shortcut-status-select');
-    drupal_add_tabledrag('shortcuts', 'order', 'sibling', 'shortcut-weight');
+    backdrop_add_tabledrag('shortcuts', 'match', 'sibling', 'shortcut-status-select');
+    backdrop_add_tabledrag('shortcuts', 'order', 'sibling', 'shortcut-weight');
     $rows[] = array(
       'data' => array(array(
-        'colspan' => 5,
-        'data' => '<strong>' . $map[$status] . '</strong>',
-      )),
+          'colspan' => 5,
+          'data' => '<strong>' . $map[$status] . '</strong>',
+        )),
       'class' => array('shortcut-status', 'shortcut-status-' . $status),
     );
 
     foreach ($shortcuts_by_status[$status] as $key) {
       $shortcut = &$form['shortcuts'][$status][$key];
       $row = array();
-      $row[] = drupal_render($shortcut['name']);
-      $row[] = drupal_render($shortcut['weight']);
-      $row[] = drupal_render($shortcut['status']);
-      $row[] = drupal_render($shortcut['edit']);
-      $row[] = drupal_render($shortcut['delete']);
+      $row[] = backdrop_render($shortcut['name']);
+      $row[] = backdrop_render($shortcut['weight']);
+      $row[] = backdrop_render($shortcut['status']);
+      $row[] = backdrop_render($shortcut['edit']);
+      $row[] = backdrop_render($shortcut['delete']);
       $rows[] = array(
         'data' => $row,
         'class' => array('draggable'),
@@ -377,9 +386,9 @@ function theme_shortcut_set_customize($variables) {
       for ($i = 0; $i < shortcut_max_slots(); $i++) {
         $rows['empty-' . $i] = array(
           'data' => array(array(
-            'colspan' => 5,
-            'data' => '<em>' . t('Empty') . '</em>',
-          )),
+              'colspan' => 5,
+              'data' => '<em>' . t('Empty') . '</em>',
+            )),
           'class' => array('shortcut-slot-empty'),
         );
       }
@@ -392,10 +401,13 @@ function theme_shortcut_set_customize($variables) {
     }
   }
 
-  $header = array(t('Name'), t('Weight'), t('Status'), array('data' => t('Operations'), 'colspan' => 2));
+  $header = array(t('Name'), t('Weight'), t('Status'), array(
+      'data' => t('Operations'),
+      'colspan' => 2,
+    ));
   $output = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'shortcuts'), 'empty' => t('No shortcuts available. <a href="@link">Add a shortcut</a>.', array('@link' => url('admin/config/user-interface/shortcut/' . $form['#shortcut_set_name'] . '/add-link')))));
-  $output .= drupal_render($form['actions']);
-  $output = drupal_render_children($form) . $output;
+  $output .= backdrop_render($form['actions']);
+  $output = backdrop_render_children($form) . $output;
   return $output;
 }
 
@@ -417,7 +429,7 @@ function theme_shortcut_set_customize($variables) {
  * @see shortcut_link_add_submit()
  */
 function shortcut_link_add($form, &$form_state, $shortcut_set) {
-  drupal_set_title(t('Add new shortcut'));
+  backdrop_set_title(t('Add new shortcut'));
   $form['shortcut_set'] = array(
     '#type' => 'value',
     '#value' => $shortcut_set,
@@ -444,7 +456,7 @@ function shortcut_link_add($form, &$form_state, $shortcut_set) {
  * @see shortcut_link_edit_submit()
  */
 function shortcut_link_edit($form, &$form_state, $shortcut_link) {
-  drupal_set_title(t('Editing @shortcut', array('@shortcut' => $shortcut_link['link_title'])));
+  backdrop_set_title(t('Editing @shortcut', array('@shortcut' => $shortcut_link['link_title'])));
   $form['original_shortcut_link'] = array(
     '#type' => 'value',
     '#value' => $shortcut_link,
@@ -467,11 +479,11 @@ function _shortcut_link_form_elements($shortcut_link = NULL) {
   if (!isset($shortcut_link)) {
     $shortcut_link = array(
       'link_title' => '',
-      'link_path' => ''
+      'link_path' => '',
     );
   }
   else {
-    $shortcut_link['link_path'] = ($shortcut_link['link_path'] == '<front>') ? '' : drupal_get_path_alias($shortcut_link['link_path']);
+    $shortcut_link['link_path'] = ($shortcut_link['link_path'] == '<front>') ? '' : backdrop_get_path_alias($shortcut_link['link_path']);
   }
 
   $form['shortcut_link']['#tree'] = TRUE;
@@ -491,7 +503,7 @@ function _shortcut_link_form_elements($shortcut_link = NULL) {
     '#description' => t('The path to the shortcut.'),
     '#size' => 40,
     '#maxlength' => 255,
-    '#field_prefix' => url(NULL, array('absolute' => TRUE)) . (variable_get('clean_url', 0) ? '' : '?q='),
+    '#field_prefix' => url(NULL, array('absolute' => TRUE)) . (config_get('system.core', 'clean_url') ? '' : '?q='),
     '#default_value' => $shortcut_link['link_path'],
   );
 
@@ -520,7 +532,7 @@ function shortcut_link_edit_validate($form, &$form_state) {
  */
 function shortcut_link_edit_submit($form, &$form_state) {
   // Normalize the path in case it is an alias.
-  $shortcut_path = drupal_get_normal_path($form_state['values']['shortcut_link']['link_path']);
+  $shortcut_path = backdrop_get_normal_path($form_state['values']['shortcut_link']['link_path']);
   if (empty($shortcut_path)) {
     $shortcut_path = '<front>';
   }
@@ -530,7 +542,7 @@ function shortcut_link_edit_submit($form, &$form_state) {
 
   menu_link_save($shortcut_link);
   $form_state['redirect'] = 'admin/config/user-interface/shortcut/' . $shortcut_link['menu_name'];
-  drupal_set_message(t('The shortcut %link has been updated.', array('%link' => $shortcut_link['link_title'])));
+  backdrop_set_message(t('The shortcut %link has been updated.', array('%link' => $shortcut_link['link_title'])));
 }
 
 /**
@@ -544,7 +556,7 @@ function shortcut_link_add_submit($form, &$form_state) {
   shortcut_admin_add_link($shortcut_link, $shortcut_set, shortcut_max_slots());
   shortcut_set_save($shortcut_set);
   $form_state['redirect'] = 'admin/config/user-interface/shortcut/' . $shortcut_link['menu_name'];
-  drupal_set_message(t('Added a shortcut for %title.', array('%title' => $shortcut_link['link_title'])));
+  backdrop_set_message(t('Added a shortcut for %title.', array('%title' => $shortcut_link['link_title'])));
 }
 
 /**
@@ -580,7 +592,7 @@ function shortcut_admin_add_link($shortcut_link, &$shortcut_set, $limit = NULL) 
   }
 
   // Normalize the path in case it is an alias.
-  $shortcut_link['link_path'] = drupal_get_normal_path($shortcut_link['link_path']);
+  $shortcut_link['link_path'] = backdrop_get_normal_path($shortcut_link['link_path']);
   if (empty($shortcut_link['link_path'])) {
     $shortcut_link['link_path'] = '<front>';
   }
@@ -649,7 +661,7 @@ function shortcut_set_edit_form_submit($form, &$form_state) {
   $shortcut_set = $form_state['values']['shortcut_set'];
   $shortcut_set->title = $form_state['values']['title'];
   shortcut_set_save($shortcut_set);
-  drupal_set_message(t('Updated set name to %set-name.', array('%set-name' => $shortcut_set->title)));
+  backdrop_set_message(t('Updated set name to %set-name.', array('%set-name' => $shortcut_set->title)));
   $form_state['redirect'] = "admin/config/user-interface/shortcut/$shortcut_set->set_name";
 }
 
@@ -713,7 +725,7 @@ function shortcut_set_delete_form_submit($form, &$form_state) {
   $shortcut_set = shortcut_set_load($form_state['values']['shortcut_set']);
   shortcut_set_delete($shortcut_set);
   $form_state['redirect'] = 'admin/config/user-interface/shortcut';
-  drupal_set_message(t('The shortcut set %title has been deleted.', array('%title' => $shortcut_set->title)));
+  backdrop_set_message(t('The shortcut set %title has been deleted.', array('%title' => $shortcut_set->title)));
 }
 
 /**
@@ -755,7 +767,7 @@ function shortcut_link_delete_submit($form, &$form_state) {
   $shortcut_link = $form_state['values']['shortcut_link'];
   menu_link_delete($shortcut_link['mlid']);
   $form_state['redirect'] = 'admin/config/user-interface/shortcut/' . $shortcut_link['menu_name'];
-  drupal_set_message(t('The shortcut %title has been deleted.', array('%title' => $shortcut_link['link_title'])));
+  backdrop_set_message(t('The shortcut %title has been deleted.', array('%title' => $shortcut_link['link_title'])));
 }
 
 /**
@@ -767,7 +779,7 @@ function shortcut_link_delete_submit($form, &$form_state) {
  *   Returned from shortcut_set_load().
  */
 function shortcut_link_add_inline($shortcut_set) {
-  if (isset($_REQUEST['token']) && drupal_valid_token($_REQUEST['token'], 'shortcut-add-link') && shortcut_valid_link($_GET['link'])) {
+  if (isset($_REQUEST['token']) && backdrop_valid_token($_REQUEST['token'], 'shortcut-add-link') && shortcut_valid_link($_GET['link'])) {
     $item = menu_get_item($_GET['link']);
     $title = ($item && $item['title']) ? $item['title'] : $_GET['name'];
     $link = array(
@@ -776,12 +788,12 @@ function shortcut_link_add_inline($shortcut_set) {
     );
     shortcut_admin_add_link($link, $shortcut_set, shortcut_max_slots());
     if (shortcut_set_save($shortcut_set)) {
-      drupal_set_message(t('Added a shortcut for %title.', array('%title' => $link['link_title'])));
+      backdrop_set_message(t('Added a shortcut for %title.', array('%title' => $link['link_title'])));
     }
     else {
-      drupal_set_message(t('Unable to add a shortcut for %title.', array('%title' => $link['link_title'])));
+      backdrop_set_message(t('Unable to add a shortcut for %title.', array('%title' => $link['link_title'])));
     }
-    drupal_goto();
+    backdrop_goto();
   }
 
   return MENU_ACCESS_DENIED;

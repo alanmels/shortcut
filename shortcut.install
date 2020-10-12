@@ -25,21 +25,22 @@ function shortcut_install() {
       'weight' => -19,
     ),
   );
-  // If Drupal is being installed, rebuild the menu before saving the shortcut
+  // If Backdrop is being installed, rebuild the menu before saving the shortcut
   // set, to make sure the links defined above can be correctly saved. (During
   // installation, the menu might not have been built at all yet, or it might
   // have been built but without the node module's links in it.)
-  if (drupal_installation_attempted()) {
+  if (backdrop_installation_attempted()) {
     menu_rebuild();
   }
   shortcut_set_save($shortcut_set);
+  // Dynamically generated variable data was detected on the following lines.
 }
 
 /**
  * Implements hook_uninstall().
  */
 function shortcut_uninstall() {
-  drupal_load('module', 'shortcut');
+  backdrop_load('module', 'shortcut');
   // Delete the menu links associated with each shortcut set.
   foreach (shortcut_sets() as $shortcut_set) {
     menu_delete_links($shortcut_set->set_name);
@@ -112,4 +113,13 @@ function shortcut_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function shortcut_update_1000() {
+  $config = config('shortcut.settings');
+  $config->set('shortcut_max_slots', update_variable_get('shortcut_max_slots', '7'));
+  update_variable_del('shortcut_max_slots');
 }
