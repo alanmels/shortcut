@@ -609,103 +609,38 @@ function shortcut_renderable_links($shortcut_set = NULL) {
 }
 
 /**
- * Implements hook_preprocess_page().
- */
-function shortcut_preprocess_page(&$variables) {
-  // Only display the shortcut link if the user has the ability to edit
-  // shortcuts and if the page's actual content is being shown (for example,
-  // we do not want to display it on "access denied" or "page not found"
-  // pages).
-  if (shortcut_set_edit_access() && ($item = menu_get_item()) && $item['access']) {
-    $link = $_GET['q'];
-    $query_parameters = backdrop_get_query_parameters();
-    if (!empty($query_parameters)) {
-      $link .= '?' . backdrop_http_build_query($query_parameters);
-    }
-    $query = array(
-      'link' => $link,
-      'name' => backdrop_get_title(),
-    );
-    $query += backdrop_get_destination();
+* Implements hook_admin_bar_output_build(&$content).
+*/
 
-    $shortcut_set = shortcut_current_displayed_set();
-
-    // Check if $link is already a shortcut and set $link_mode accordingly.
-    foreach ($shortcut_set->links as $shortcut) {
-      if ($link == $shortcut['link_path']) {
-        $mlid = $shortcut['mlid'];
-        break;
-      }
-    }
-    $link_mode = isset($mlid) ? "remove" : "add";
-
-    if ($link_mode == "add") {
-      $query['token'] = backdrop_get_token('shortcut-add-link');
-      $link_text = shortcut_set_switch_access() ? t('Add to %shortcut_set shortcuts', array('%shortcut_set' => $shortcut_set->title)) : t('Add to shortcuts');
-      $link_path = 'admin/config/user-interface/shortcut/' . $shortcut_set->set_name . '/add-link-inline';
-    }
-    else {
-      $query['mlid'] = $mlid;
-      $link_text = shortcut_set_switch_access() ? t('Remove from %shortcut_set shortcuts', array('%shortcut_set' => $shortcut_set->title)) : t('Remove from shortcuts');
-      $link_path = 'admin/config/user-interface/shortcut/link/' . $mlid . '/delete';
-    }
-
-    if (theme_get_setting('shortcut_module_link')) {
-      $variables['title_suffix']['add_or_remove_shortcut'] = array(
-        '#attached' => array('css' => array(backdrop_get_path('module', 'shortcut') . '/shortcut.css')),
-        '#prefix' => '<div class="add-or-remove-shortcuts ' . $link_mode . '-shortcut">',
-        '#type' => 'link',
-        '#title' => '<span class="icon"></span><span class="text">' . $link_text . '</span>',
-        '#href' => $link_path,
-        '#options' => array(
-          'query' => $query,
-          'html' => TRUE,
-        ),
-        '#suffix' => '</div>',
-      );
-    }
-  }
-}
-
-/**
- * Implements hook_page_alter(). REMOVE!!!!!
- */
-function shortcut_page_alter(&$page) {
-  if (isset($page['page_top']['toolbar'])) {
-    // If the toolbar is available, add a pre-render function to display the
-    // current shortcuts in the toolbar drawer.
-    $page['page_top']['toolbar']['#pre_render'][] = 'shortcut_toolbar_pre_render';
-  }
-}
-
-
-/**
- * Pre-render function for adding shortcuts to the toolbar drawer.
- */
-function shortcut_toolbar_pre_render($toolbar) {
-  $links = shortcut_renderable_links();
-  $links['#attached'] = array('css' => array(backdrop_get_path('module', 'shortcut') . '/shortcut.css'));
-  $links['#prefix'] = '<div class="toolbar-shortcuts">';
-  $links['#suffix'] = '</div>';
+function shortcut_admin_bar_output_build(&$content) {
+  global $user;
   $shortcut_set = shortcut_current_displayed_set();
-  $configure_link = NULL;
+
+  // Add 'My shortcuts' top level menu to admin bar.
   if (shortcut_set_edit_access($shortcut_set)) {
-    $configure_link = array(
-      '#type' => 'link',
-      '#title' => t('Edit shortcuts'),
+    $content['menu']['menu']['shortcuts'] = array(
       '#href' => 'admin/config/user-interface/shortcut/' . $shortcut_set->set_name,
-      '#options' => array('attributes' => array('id' => 'edit-shortcuts')),
+      '#title' => t('My shortcuts'),
+      '#attributes' => array('class' => array('shortcut')),
+      '#weight' => 5,
     );
   }
-
-  $drawer = array(
-    'shortcuts' => $links,
-    'configure' => $configure_link,
-  );
-
-  $toolbar['toolbar_drawer'][] = $drawer;
-  return $toolbar;
+  else {
+    $content['menu']['menu']['shortcuts'] = array(
+      '#title' => t('My shortcuts'),
+      '#attributes' => array('class' => array('shortcut')),
+      '#weight' => 5,
+    );
+  }
+  // Add all the rest of shortcuts.
+  foreach ($shortcut_set->links as $key => $value) {
+    $content['menu']['menu']['shortcuts'][$key] = array(
+      '#title' => t("@title", array('@title' => $value['link_title'])),
+      '#href' => $value['link_path'],
+    );
+  }
 }
+
 
 /**
  * Returns the sanitized title of a shortcut set.
