@@ -1,0 +1,11 @@
+#admin-bar #admin-bar-menu > li > .dropdown > li > .shortcuts {
+    background: transparent url('../images/shortcut.png') 5% center no-repeat;
+    background-size: auto;
+    background-size: 16px;
+}
+#admin-bar #admin-bar-menu > li > .dropdown > li > span {
+    padding-left: 28px;
+}
+#admin-bar #admin-bar-menu li.shortcuts.expandable {
+  background-color: #0073bd;
+}

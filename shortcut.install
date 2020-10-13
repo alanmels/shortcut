@@ -114,12 +114,3 @@ function shortcut_schema() {
 
   return $schema;
 }
-
-/**
- * Implements hook_update_N().
- */
-function shortcut_update_1000() {
-  $config = config('shortcut.settings');
-  $config->set('shortcut_max_slots', update_variable_get('shortcut_max_slots', '7'));
-  update_variable_del('shortcut_max_slots');
-}

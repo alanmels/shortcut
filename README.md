@@ -44,7 +44,7 @@ or
 
 2) Go to **Configuration > User accounts > Permissions** (`admin/config/people/permissions#module-admin_bar`)
 and give authenticated (or any other) role the `Access administration bar`
-permission, clear cache and the new `My shortcuts` menu item will appear on the
+permission, clear cache and the new `Shortcuts` menu item will appear on the
 admin bar.
 
 Troubleshooting

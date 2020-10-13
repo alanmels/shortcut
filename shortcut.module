@@ -608,57 +608,46 @@ function shortcut_renderable_links($shortcut_set = NULL) {
   return menu_tree($shortcut_set->set_name);
 }
 
+
 /**
 * Implements hook_admin_bar_output_build(&$content).
 */
 
 function shortcut_admin_bar_output_build(&$content) {
-  global $user;
-  $shortcut_set = shortcut_current_displayed_set();
+  // Exit early if user have no access to admin bar.
+  if (!user_access('access administration bar')) {
+    backdrop_exit();
+  }
 
-  // Add 'My shortcuts' top level menu to admin bar.
+  // Load stylesheet file.
+  backdrop_add_css(backdrop_get_path('module', 'shortcut') . '/css/shortcut.css');
+
+  // Add a 'Shortcuts' top level menu item to admin bar.
+  $shortcut_set = shortcut_current_displayed_set();
   if (shortcut_set_edit_access($shortcut_set)) {
     $content['menu']['menu']['shortcuts'] = array(
       '#href' => 'admin/config/user-interface/shortcut/' . $shortcut_set->set_name,
-      '#title' => t('My shortcuts'),
-      '#attributes' => array('class' => array('shortcut')),
-      '#weight' => 5,
+      '#title' => t('Shortcuts'),
+      '#attributes' => array('class' => array('shortcuts')),
+      '#weight' => 6,
     );
   }
   else {
     $content['menu']['menu']['shortcuts'] = array(
-      '#title' => t('My shortcuts'),
-      '#attributes' => array('class' => array('shortcut')),
-      '#weight' => 5,
+      '#title' => t('Shortcuts'),
+      '#attributes' => array('class' => array('shortcuts')),
+      '#weight' => 6,
     );
   }
-  // Add all the rest of shortcuts.
+  // Add all enabled links in the current shortcut set.
   foreach ($shortcut_set->links as $key => $value) {
-    $content['menu']['menu']['shortcuts'][$key] = array(
-      '#title' => t("@title", array('@title' => $value['link_title'])),
-      '#href' => $value['link_path'],
-    );
+    if ($value['hidden'] != TRUE) {
+      $content['menu']['menu']['shortcuts'][$key] = array(
+        '#title' => t("@title", array('@title' => $value['link_title'])),
+        '#href' => $value['link_path'],
+      );
+    }
   }
-}
-
-
-/**
- * Returns the sanitized title of a shortcut set.
- *
- * Deprecated. This function was previously used as a menu item title callback
- * but has been replaced by shortcut_set_title_callback() (which does not
- * sanitize the title, since the menu system does that automatically). In
- * Drupal 7, use that function for title callbacks, and call check_plain()
- * directly if you need a sanitized title. In Drupal 8, this function will be
- * restored as a title callback and therefore will no longer sanitize its
- * output.
- *
- * @param $shortcut_set
- *   An object representing the shortcut set, as returned by
- *   shortcut_set_load().
- */
-function shortcut_set_title($shortcut_set) {
-  return check_plain($shortcut_set->title);
 }
 
 /**
@@ -672,12 +661,4 @@ function shortcut_set_title($shortcut_set) {
  */
 function shortcut_set_title_callback($shortcut_set) {
   return $shortcut_set->title;
-}
-
-/**
- * Implements hook_autoload_info().
- */
-function shortcut_autoload_info() {
-  return array(
-  );
 }
