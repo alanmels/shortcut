@@ -11,10 +11,11 @@ Download and place the recommended version of the module in your website's
 modules directory, go to the **Functionality** page (`/admin/modules`) and
 enable the **Shortcut** module.
 
-Alternatively, use [Brush](https://github.com/backdrop-contrib/brush) and just run on CLI:
+Alternatively, use [Brush](https://github.com/backdrop-contrib/brush) and just run:
 ```
 brush -y en shortcut
 ```
+on your terminal and it will automatically download and enable the module.
 
 Configuration
 -------------
