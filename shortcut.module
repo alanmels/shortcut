@@ -608,6 +608,12 @@ function shortcut_renderable_links($shortcut_set = NULL) {
   return menu_tree($shortcut_set->set_name);
 }
 
+function shortcut_init() {
+  // Load stylesheet file.
+  if (user_access('access administration bar')) {
+    backdrop_add_css(backdrop_get_path('module', 'shortcut') . '/css/shortcut.css');
+  }
+}
 
 /**
 * Implements hook_admin_bar_output_build(&$content).
@@ -618,9 +624,6 @@ function shortcut_admin_bar_output_build(&$content) {
   if (!user_access('access administration bar')) {
     backdrop_exit();
   }
-
-  // Load stylesheet file.
-  backdrop_add_css(backdrop_get_path('module', 'shortcut') . '/css/shortcut.css');
 
   // Add a 'Shortcuts' top level menu item to admin bar.
   $shortcut_set = shortcut_current_displayed_set();

@@ -9,3 +9,6 @@
 #admin-bar #admin-bar-menu li.shortcuts.expandable {
   background-color: #0073bd;
 }
+#admin-bar #admin-bar-menu > li > .dropdown > li > a.shortcuts.expanded-trail {
+  background-color: #338FCA;
+}
