@@ -48,7 +48,7 @@ admin bar.
 
 Troubleshooting
 ---------------
-Report all the issues on https://github.com/backdrop-contrib/shortcut/issues.
+Report all issues on https://github.com/backdrop-contrib/shortcut/issues.
 
 Credits
 -------
