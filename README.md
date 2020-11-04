@@ -52,5 +52,4 @@ Report all issues on https://github.com/backdrop-contrib/shortcut/issues.
 
 Credits
 -------
-The [Shortcut](https://www.drupal.org/project/protected_submissions) module had
-initially been created for Drupal. Ported to Backdrop by [AltaGrade](https://www.altagrade.com) team.
+Ported by [AltaGrade](https://www.altagrade.com) team.
