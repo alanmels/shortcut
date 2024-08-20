@@ -11,11 +11,11 @@ Download and place the recommended version of the module in your website's
 modules directory, go to the **Functionality** page (`/admin/modules`) and
 enable the **Shortcut** module.
 
-Alternatively, use [Brush](https://github.com/backdrop-contrib/brush) and just run:
+Alternatively, use [Bee](https://github.com/backdrop-contrib/bee) and just run:
 ```
-brush -y en shortcut
+bee -y en shortcut
 ```
-on your terminal and it will automatically download and enable the module.
+on your terminal, and it will automatically download and enable the module.
 
 Configuration
 -------------
@@ -25,7 +25,7 @@ page to manage shortcut sets. You can create new shortcut sets, delete existing
 ones, change set names, list links and add or delete shortcut links.
 
 Go to **Configuration > User accounts > Permissions** (`admin/config/people/permissions#module-shortcut`)
-and set desired permissions for user roles. 
+and set desired permissions for user roles.
 
 Admins can assign specific shortcut sets to users on their individual account pages (`user/[uid]/shortcuts`).
 
